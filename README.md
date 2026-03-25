@@ -188,7 +188,7 @@ But it wasn't happening parallely. By the time user joined, message was already 
 
 **Step 1)** Run `rabbitmq-server start` to start RabbitMQ
 
-**Step 2)** Run `npm init`
+**Step 2)** Run `npm install`
 
 **Step 3)** Run `npm start` to start the server
 
