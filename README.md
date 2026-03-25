@@ -192,9 +192,7 @@ But it wasn't happening parallely. By the time user joined, message was already 
 
 **Step 3)** Run `npm start` to start the server
 
-**Step 4)** Run `npm start` to start the server
-
-**Step 3)** User should send a POST request to `/api/user/ai-task-run/:id`
+**Step 4)** User should send a POST request to `/api/user/ai-task-run/:id`
 or `/api/user/ai-task-run/others` for a new task that doesn't exist in the DB
 (with valid inputs to get a roomId)
 
