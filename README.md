@@ -81,6 +81,9 @@ Main Design Process:
 2) Users can either choose out of existing tasks or send a custom task(still working on custom task logic)
 3) For exisitng tasks user sends textContent(if processing text) or filePath ( for pdf,image,docx)
 4) User should have minimal interaction and only provide essential inputs so mimetype field and type of data is auto set based on file path extension. (mimetype is later needed for gemini api call)
+5) Multiple users running task simaltaneously shouldn't block each other, Workers should be scalable.
+6) Each user should get their gemini call result in a socket.io room( with unique roomId) (as request/response cycle might timeout, socket.io room allows persistent connection till response is fetched)
+7) Validating roomId or already processed task if incorrect roomId is sent, onError socket event should be triggered saying invalid roomId or request already processed.
 
 
 
