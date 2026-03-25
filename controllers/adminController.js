@@ -160,7 +160,7 @@ const deleteTask=async(req,res,next)=>{
         }
         
         //if task exists delete task by id
-        const user=await Task.findByIdAndDelete(taskId)
+        const deletedTask=await Task.findByIdAndDelete(taskId)
         
 
         res.json({

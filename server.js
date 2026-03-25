@@ -12,11 +12,23 @@ const connectRabbit = require('./config/rabbitmq')
 const errorHandler = require('./middlewares/errorHandler')
 const app = express()
 const {websocketSetup}=require('./config/socket') 
+const fs = require('fs');
+
+
+//create folder if doesnt exist
+if (!fs.existsSync('./uploads')) fs.mkdirSync('./uploads');
+
+
+
 
 //create server instance to inititalise socket.io
 const server=http.createServer(app)
 
-app.use(express.json())
+
+
+app.use(express.json()) //parses req.body
+app.use(express.urlencoded({ extended: true })); //allows parsing form data
+
 let io=websocketSetup(server)
 
 //listen to connection event
@@ -32,10 +44,7 @@ io.on('connection',(socket)=>{
 
     })
 
-    //event listener for when task already executed or user joins invalid roomid
-    socket.on('taskError',(msg)=>{
-        console.log(msg)
-    })
+   
 
 
     socket.on('disconnect',()=>{

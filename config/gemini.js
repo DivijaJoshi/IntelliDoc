@@ -3,7 +3,7 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 
 
-const geminiCall=async(task,inputs)=>{
+const geminiCall=async(task,inputs,existingTasks)=>{
 
 
     //format complete prompt with examples, input and output format
@@ -11,11 +11,24 @@ const geminiCall=async(task,inputs)=>{
     let fewShotprompt=''
     task.examples.forEach(example=>
         {
-        fewShotprompt=`Example input is: ${example.input} and \n
+        fewShotprompt+=`Example input is: ${example.input} and \n
         Example output is: ${example.output} Follow the above formatting.\n\n\n`
     })
 
-    const finalPrompt=`${fewShotprompt}\n ${task.prompt}`
+    let finalPrompt=`${fewShotprompt}\n ${task.prompt}`
+
+
+    if(existingTasks){
+         finalPrompt+=`\n\n\n You are given a list of existing tasks:
+         ${existingTasks}\n\n If user's request is similar to any exisitng task above by checking it's intent, 
+         inform the user that the task already exists, mention the task name and ID and say to use it instead.
+         \n\n
+         
+         else
+         if user request is not similar to any existing task above,process the request normally.\n
+          Ensure that the request lies in documnet processing/text processing/image processing domain only.\n
+           else tell the user appropriate message. `
+    }
     
 
     //create contents object (The Gemini API represents prompts as structured Content objects

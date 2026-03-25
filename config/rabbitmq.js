@@ -14,7 +14,6 @@ const connectRabbit = async () => {
     const tasks = await Task.find({});
     
 
-    channel.prefetch(1,false);
     for (const task of tasks) {
       await channel.assertQueue(task.queueName, { durable: true });
       channel.bindQueue(task.queueName, exchange, task.routingKey);
@@ -24,7 +23,10 @@ const connectRabbit = async () => {
     }
 
 
-    
+    // setup custom task queue
+    await channel.assertQueue('custom_queue', { durable: true })
+    channel.bindQueue('custom_queue', exchange, 'task.custom')
+    console.log('Queue bound: custom_queue -> task.custom')
     return channel;
 
  

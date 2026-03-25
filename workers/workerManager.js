@@ -5,12 +5,19 @@ const ConsumerWorker=require('./worker')
 const WorkerManager=async(channel)=>{
 
     //store queue name and worker count
-    let defaultWorkers={}
+    let defaultWorkers={custom_queue:1}
     
     const minWorkers=1 //set min workers running to initialise for each queue
     const maxWorkers=4  //set max workers that are allowed 
     
     const interval=10000 //10 seconds
+
+
+    //how many messages can be sent to a worker at once before acknowledgement of past message
+    channel.prefetch(1,false); //Applies to individual consumers
+
+    //start consumer worker for custom_queue
+    ConsumerWorker(channel, 'custom_queue')
 
     //run every 10 seconds to check for new tasks to start new worker or scale
     setInterval(async ()=>{
@@ -36,9 +43,6 @@ const WorkerManager=async(channel)=>{
                     await channel.assertQueue(task.queueName, { durable: true });
                     channel.bindQueue(task.queueName,'taskExchange', task.routingKey);
 
-                    //how many messages can be sent to a worker at once before acknowledgement of past message
-                    channel.prefetch(1,false); //Applies to individual consumers
-
                     //update defaultWorkers with 1 worker for each queue intially
                     defaultWorkers[task.queueName]=minWorkers
 
@@ -50,11 +54,11 @@ const WorkerManager=async(channel)=>{
                 
 
             //for each queue find count of messages in queue to scale workers
-            const messageCount=await channel.checkQueue(task.queueName)
+            const queueInfo=await channel.checkQueue(task.queueName)
+            const messageCount=queueInfo.messageCount
 
             //assume 1 worker can handle 2 tasks without very long wait times
-            if(messageCount>defaultWorkers[task.queueName]*2)
-                if(defaultWorkers[task.queueName]<maxWorkers) 
+            if((messageCount>defaultWorkers[task.queueName]*2) && (defaultWorkers[task.queueName]<maxWorkers))
                     //keep worker count under a threshold value
             {
                 //scale and add more workers
@@ -63,8 +67,7 @@ const WorkerManager=async(channel)=>{
                 console.log(`More workers added for ${task.queueName} with message count ${messageCount}`)
 
                 }
-    }
-
+            }
     },interval)
     
 

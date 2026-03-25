@@ -12,6 +12,11 @@ const errorHandler=(error,req,res,next)=>{
       });
     }
 
+if (typeof error.code === 'string') {
+        return res.status(400).json({ error: { message: error.message } })
+    }
+   
+
 
     //Handle all errors defined by accessing error object
     return res.status(error.code||500).json({
